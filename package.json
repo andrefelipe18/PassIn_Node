@@ -1,0 +1,17 @@
+{
+  "name": "passin",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "dev": "bun --watch ./src/server/index.ts"
+  },
+  "dependencies": {
+    "fastify": "^4.26.2"
+  }
+}
