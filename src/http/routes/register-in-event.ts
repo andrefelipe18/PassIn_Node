@@ -20,22 +20,50 @@ export async function registerInEvent(app: FastifyInstance) {
           201: z.object({
             attendeeId: z.number(),
           }),
+          400: z.object({
+            message: z.string(),
+          }),
         },
       },
     },
     async (request, reply) => {
-        const {eventId} = request.params;
-        const {name, email} = request.body;
+      const { eventId } = request.params;
+      const { name, email } = request.body;
 
-        const attendee = await prisma.attendee.create({
-            data: {
-                name,
-                email,
-                eventId
-            }
+      const attendeeExists = await prisma.attendee.findFirst({
+        where: {
+          email,
+          eventId,
+        },
+      });
+
+      if (attendeeExists) {
+        return reply.status(400).send({
+          message: "Attendee already registered",
         });
+      }
 
-        return reply.status(201).send({attendeeId: attendee.id});
+      const event = await prisma.event.findUnique({
+        where: {
+          id: eventId,
+        },
+      });
+
+      if (!event) {
+        return reply.status(400).send({
+          message: "Event not found",
+        });
+      }
+
+      const attendee = await prisma.attendee.create({
+        data: {
+          name,
+          email,
+          eventId,
+        },
+      });
+
+      return reply.status(201).send({ attendeeId: attendee.id });
     }
   );
 }
