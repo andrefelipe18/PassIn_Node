@@ -5,10 +5,11 @@ import { FastifyInstance } from "fastify";
 import { prisma } from "../../utils/PrismaClient.js";
 
 export async function createEvent(app: FastifyInstance) {
-  app.withTypeProvider<ZodTypeProvider>().post(
-    "/events", //Rota
-    {
-      schema: { //Schema de validação
+  app
+  .withTypeProvider<ZodTypeProvider>()
+  .post("/events", //Rota
+    { //Schema de validação
+      schema: { 
         body: z.object({
           title: z.string().min(4),
           details: z.string().nullable(),
@@ -25,7 +26,7 @@ export async function createEvent(app: FastifyInstance) {
         },
       },
     },
-    async (request, reply) => {
+    async (request, reply) => { //Handler
       const { title, details, maximumAttendees } = request.body;
 
       const slug = generateSlug(title);

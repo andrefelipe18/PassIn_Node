@@ -4,6 +4,7 @@ import {
   validatorCompiler,
 } from "fastify-type-provider-zod";
 import { createEvent } from "./http/routes/create-event.js";
+import { registerInEvent } from "./http/routes/register-in-event.js";
 
 const app = fastify();
 
@@ -12,6 +13,7 @@ app.setValidatorCompiler(validatorCompiler);
 
 //Routes
 app.register(createEvent);
+app.register(registerInEvent);
 
 app
   .listen({
