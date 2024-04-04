@@ -11,7 +11,19 @@ export async function getAttendeeCredentials(app: FastifyInstance) {
         params: z.object({
           attendeeId: z.string().transform(Number),
         }),
-        response: {},
+        response: {
+          200: z.object({
+            credential: z.object({
+              name: z.string(),
+              email: z.string().email(),
+              eventTitle: z.string(),
+              checkInUrl: z.string().url(),
+            }),
+          }),
+          404: z.object({
+            message: z.string(),
+          }),
+        },
       },
     },
     async (request, reply) => {
@@ -37,9 +49,17 @@ export async function getAttendeeCredentials(app: FastifyInstance) {
           message: "Attendee not found",
         });
       }
+      const baseURL = `${request.protocol}://${request.hostname}`;
+
+      const checkInUrl = new URL(`/attendees/R${attendeeId}/check-in`, baseURL);
 
       return reply.status(200).send({
-        attendee,
+        credential: {
+          name: attendee.name,
+          email: attendee.email,
+          eventTitle: attendee.event.title,
+          checkInUrl: checkInUrl.toString(),
+        }
       });
     }
   );
