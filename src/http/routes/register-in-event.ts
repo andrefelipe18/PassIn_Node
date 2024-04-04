@@ -37,21 +37,38 @@ export async function registerInEvent(app: FastifyInstance) {
         },
       });
 
-      if (attendeeExists) {
+      if (attendeeExists !== null) {
         return reply.status(400).send({
           message: "Attendee already registered",
         });
       }
 
-      const event = await prisma.event.findUnique({
-        where: {
-          id: eventId,
-        },
-      });
+      const [event, amountOfAttendees] = await Promise.all([
+        prisma.event.findUnique({
+          where: {
+            id: eventId,
+          },
+        }),
+
+        prisma.attendee.count({
+          where: {
+            eventId,
+          },
+        }),
+      ]);
 
       if (!event) {
         return reply.status(400).send({
           message: "Event not found",
+        });
+      }
+
+      if (
+        event.maximumAttendees &&
+        amountOfAttendees >= event.maximumAttendees
+      ) {
+        return reply.status(400).send({
+          message: "Event is full",
         });
       }
 
