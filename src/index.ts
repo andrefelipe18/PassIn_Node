@@ -3,8 +3,7 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-type-provider-zod";
-import { createEvent } from "./http/routes/create-event.js";
-import { registerInEvent } from "./http/routes/register-in-event.js";
+import * as routes from './http/routes/index.js';
 
 const app = fastify();
 
@@ -12,8 +11,9 @@ app.setSerializerCompiler(serializerCompiler);
 app.setValidatorCompiler(validatorCompiler);
 
 //Routes
-app.register(createEvent);
-app.register(registerInEvent);
+Object.values(routes).forEach(route => {
+  app.register(route);
+});
 
 app
   .listen({
